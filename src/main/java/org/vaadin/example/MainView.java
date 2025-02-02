@@ -22,6 +22,7 @@ public class MainView extends VerticalLayout {
 
         // Button click listeners can be defined as lambda expressions
         Button button = new Button("Say hello", e -> {
+            System.out.println(textField.getValue());
             add(new Paragraph(textField.getValue()));
         });
 
