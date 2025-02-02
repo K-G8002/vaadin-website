@@ -11,7 +11,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 
-@Route
+@Route("/main")
 public class MainView extends VerticalLayout {
 
     public MainView() {
