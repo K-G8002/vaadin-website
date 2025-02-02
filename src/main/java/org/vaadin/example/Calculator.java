@@ -1,26 +1,72 @@
-package org.vaadin.example;
-
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-@Route("/")
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+@Route("/calculator")
 public class Calculator extends VerticalLayout {
 
+    private TextField display;
+    private StringBuilder currentInput;
+
     public Calculator() {
+        display = new TextField();
+        display.setReadOnly(true);
+        display.setWidth("200px");
 
+        currentInput = new StringBuilder();
 
-        addClassName("centered-content");
+        // Layout für die Buttons
+        VerticalLayout buttonLayout = new VerticalLayout();
 
-        add(new TextField("Ergebnis"));
+        // Zahlen & Operatoren Buttons hinzufügen
+        String[][] buttons = {
+                {"7", "8", "9", "/"},
+                {"4", "5", "6", "*"},
+                {"1", "2", "3", "-"},
+                {"0", "C", "=", "+"}
+        };
 
-        add(new HorizontalLayout(new Button("1"), new Button("2"), new Button("3"), new Button("*")));
-        add(new HorizontalLayout(new Button("4"), new Button("5"), new Button("6"), new Button("-")));
-        add(new HorizontalLayout(new Button("7"), new Button("8"), new Button("9"), new Button("+")));
-        add(new HorizontalLayout(new Button("0"), new Button("=")));
+        for (String[] row : buttons) {
+            VerticalLayout rowLayout = new VerticalLayout();
+            for (String text : row) {
+                Button button = new Button(text, event -> onButtonClick(text));
+                button.setWidth("50px");
+                rowLayout.add(button);
+            }
+            buttonLayout.add(rowLayout);
+        }
 
+        add(display, buttonLayout);
+    }
 
+    private void onButtonClick(String value) {
+        if (value.equals("C")) {
+            currentInput.setLength(0);
+            display.setValue("");
+        } else if (value.equals("=")) {
+            calculateResult();
+        } else {
+            currentInput.append(value);
+            display.setValue(currentInput.toString());
+        }
+    }
+
+    private void calculateResult() {
+        try {
+            ScriptEngineManager mgr = new ScriptEngineManager();
+            ScriptEngine engine = mgr.getEngineByName("JavaScript");
+            String result = engine.eval(currentInput.toString()).toString();
+            display.setValue(result);
+            currentInput.setLength(0);
+            currentInput.append(result);
+        } catch (ScriptException e) {
+            display.setValue("Error");
+        }
     }
 }
+
