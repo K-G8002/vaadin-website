@@ -7,23 +7,22 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-@Route("/calculator")
-public class Calculator extends VerticalLayout {
+@Route("/calc")
+
+public class calculator extends VerticalLayout {
 
     private TextField display;
     private StringBuilder currentInput;
 
-    public Calculator() {
+    public calculator() {
         display = new TextField();
         display.setReadOnly(true);
         display.setWidth("200px");
 
         currentInput = new StringBuilder();
 
-        // Layout für die Buttons
         VerticalLayout buttonLayout = new VerticalLayout();
 
-        // Zahlen & Operatoren Buttons hinzufügen
         String[][] buttons = {
                 {"7", "8", "9", "/"},
                 {"4", "5", "6", "*"},
