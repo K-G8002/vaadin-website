@@ -1,4 +1,7 @@
+package org.vaadin.example;
+
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
@@ -7,14 +10,15 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-@Route("/calc")
-
+@Route("calc")
 public class calculator extends VerticalLayout {
 
     private TextField display;
     private StringBuilder currentInput;
 
     public calculator() {
+        addClassName("centered-content");
+
         display = new TextField();
         display.setReadOnly(true);
         display.setWidth("200px");
@@ -31,7 +35,7 @@ public class calculator extends VerticalLayout {
         };
 
         for (String[] row : buttons) {
-            VerticalLayout rowLayout = new VerticalLayout();
+            HorizontalLayout rowLayout = new HorizontalLayout();
             for (String text : row) {
                 Button button = new Button(text, event -> onButtonClick(text));
                 button.setWidth("50px");
@@ -59,13 +63,17 @@ public class calculator extends VerticalLayout {
         try {
             ScriptEngineManager mgr = new ScriptEngineManager();
             ScriptEngine engine = mgr.getEngineByName("JavaScript");
-            String result = engine.eval(currentInput.toString()).toString();
+            String expression = currentInput.toString();
+            System.out.println("Expression: " + expression); // Debugging-Ausgabe
+            String result = engine.eval(expression).toString();
             display.setValue(result);
             currentInput.setLength(0);
             currentInput.append(result);
         } catch (ScriptException e) {
+            e.printStackTrace();
             display.setValue("Error");
         }
     }
+
 }
 
