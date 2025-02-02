@@ -39,6 +39,8 @@ public class MainView extends VerticalLayout {
         // Example: Pressing enter in this view clicks the Button.
         button.addClickShortcut(Key.ENTER);
 
+
+
         // Use custom CSS classes to apply styling. This is defined in
         // styles.css.
         addClassName("centered-content");
