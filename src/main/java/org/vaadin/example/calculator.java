@@ -1,5 +1,6 @@
 package org.vaadin.example;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 
 import javax.script.ScriptEngine;
@@ -22,6 +24,10 @@ public class calculator extends VerticalLayout {
     private StringBuilder currentInput;
 
     public calculator() {
+        if (VaadinSession.getCurrent().getAttribute("user") == null) {
+            UI.getCurrent().navigate("login");
+            return;
+        }
         addClassName("centered-content");
 
         display = new TextField();
@@ -57,6 +63,12 @@ public class calculator extends VerticalLayout {
 
         layout.add(lumoIcon, vaadinIcon);
         add(layout);
+
+        Button logoutButton = new Button("Logout", event -> {
+            VaadinSession.getCurrent().setAttribute("user", null);
+            UI.getCurrent().navigate("login");
+        });
+        add(logoutButton);
     }
 
     private void onButtonClick(String value) {
@@ -90,8 +102,8 @@ public class calculator extends VerticalLayout {
 
 @Route("login")
 class login extends VerticalLayout {
-    public login() {
 
+    public login() {
         addClassName("centered-content");
         getStyle().set("background-color", "var(--lumo-contrast-5pct)")
                 .set("display", "flex").set("justify-content", "center")
@@ -114,9 +126,25 @@ class login extends VerticalLayout {
 
         LoginForm loginForm = new LoginForm();
         loginForm.setI18n(i18n);
-        add(loginForm);
+
+        loginForm.addLoginListener(event -> {
+            String username = event.getUsername();
+            String password = event.getPassword();
+
+            if (authenticate(username, password)) {
+                VaadinSession.getCurrent().setAttribute("user", username);
+                UI.getCurrent().navigate("calc");
+            } else {
+                loginForm.setError(true);
+            }
+        });
 
         loginForm.getElement().setAttribute("no-autofocus", "");
+        add(loginForm);
+    }
+
+    private boolean authenticate(String username, String password) {
+        return "KarliBobMarli".equals(username) && "1234".equals(password);
     }
 }
 
