@@ -17,7 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-@Route("calc")
+@Route("website")
 public class calculator extends VerticalLayout {
 
     private TextField display;
@@ -54,7 +54,6 @@ public class calculator extends VerticalLayout {
             }
             buttonLayout.add(rowLayout);
         }
-
         add(display, buttonLayout);
 
         HorizontalLayout layout = new HorizontalLayout();
@@ -133,7 +132,7 @@ class login extends VerticalLayout {
 
             if (authenticate(username, password)) {
                 VaadinSession.getCurrent().setAttribute("user", username);
-                UI.getCurrent().navigate("calc");
+                UI.getCurrent().navigate("website");
             } else {
                 loginForm.setError(true);
             }
