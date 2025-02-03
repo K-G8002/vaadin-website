@@ -1,25 +1,53 @@
 package org.vaadin.example;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoIcon;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-package com.vaadin.demo.component.login;
+
 
 
 @Route("calc")
 public class calculator extends VerticalLayout {
+
+    private VerticalLayout createLoginInterface() {
+        VerticalLayout loginLayout = new VerticalLayout();
+
+        loginLayout.getStyle().set("background-color", "var(--lumo-contrast-5pct)")
+                .set("display", "flex").set("justify-content", "center")
+                .set("padding", "var(--lumo-space-l)");
+
+        LoginI18n i18n = LoginI18n.createDefault();
+
+        LoginI18n.Form i18nForm = i18n.getForm();
+        i18nForm.setTitle("Title");
+        i18nForm.setUsername("K8002_");
+        i18nForm.setPassword("ConfigureYoureOwnPassword");
+        i18nForm.setSubmit("Login");
+        i18nForm.setForgotPassword("Unknown Password");
+        i18n.setForm(i18nForm);
+
+        LoginI18n.ErrorMessage i18nErrorMessage = i18n.getErrorMessage();
+        i18nErrorMessage.setTitle("Problem");
+        i18nErrorMessage.setMessage("Username or Password is false");
+        i18n.setErrorMessage(i18nErrorMessage);
+
+        LoginForm loginForm = new LoginForm();
+        loginForm.setI18n(i18n);
+        loginLayout.add(loginForm);
+
+        loginForm.getElement().setAttribute("no-autofocus", "");
+
+        return loginLayout;
+    }
 
     private TextField display;
     private StringBuilder currentInput;
@@ -54,12 +82,6 @@ public class calculator extends VerticalLayout {
 
         add(display, buttonLayout);
 
-        HorizontalLayout layout = new HorizontalLayout();
-        Icon vaadinIcon = VaadinIcon.PHONE.create();
-        Icon lumoIcon = LumoIcon.PHOTO.create();
-
-        layout.add(lumoIcon, vaadinIcon);
-        add(layout);
     }
 
 
@@ -94,35 +116,5 @@ public class calculator extends VerticalLayout {
 
 }
 
-public class Login extends div {
 
-    public Login() {
-        getStyle().set("background-color", "var(--lumo-contrast-5pct)")
-                .set("display", "flex").set("justify-content", "center")
-                .set("padding", "var(--lumo-space-l)");
-
-        LoginI18n i18n = LoginI18n.createDefault();
-
-        LoginI18n.Form i18nForm = i18n.getForm();
-        i18nForm.setTitle("Title");
-        i18nForm.setUsername("K8002_");
-        i18nForm.setPassword("ConfigureYoureOwnPassword");
-        i18nForm.setsubmit("Login");
-        i18nForm.setForgotPassword("Unknown Password");
-        i18n.setForm(i18nForm);
-
-        loginI18n.ErrorMessage i18nErrorMessage = i18n.getErrorMessage();
-        i18nErrorMessage.setTitle("Problem");
-        i18nErrorMessage.setMessage("Username or Password is false");
-        i18n.setErrorMessage(i18nerrorMessage);
-
-        LoginForm loginForm = new LoginForm();
-        loginForm.setI18n(i18n);
-        add(loginForm);
-
-        loginForm.getElement().setAttribute("no-autofocus", "");
-
-
-    }
-}
 
