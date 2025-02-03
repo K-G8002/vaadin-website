@@ -1,14 +1,18 @@
 package org.vaadin.example;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
 
 @Route("calc")
 public class calculator extends VerticalLayout {
@@ -45,6 +49,13 @@ public class calculator extends VerticalLayout {
         }
 
         add(display, buttonLayout);
+
+        HorizontalLayout layout = new HorizontalLayout();
+        Icon vaadinIcon = VaadinIcon.PHONE.create();
+        Icon lumoIcon = LumoIcon.PHOTO.create();
+
+        layout.add(lumoIcon, vaadinIcon);
+        add(layout);
     }
 
     private void onButtonClick(String value) {
@@ -64,7 +75,7 @@ public class calculator extends VerticalLayout {
             ScriptEngineManager mgr = new ScriptEngineManager();
             ScriptEngine engine = mgr.getEngineByName("JavaScript");
             String expression = currentInput.toString();
-            System.out.println("Expression: " + expression); // Debugging-Ausgabe
+            System.out.println("Expression: " + expression);
             String result = engine.eval(expression).toString();
             display.setValue(result);
             currentInput.setLength(0);
@@ -74,6 +85,7 @@ public class calculator extends VerticalLayout {
             display.setValue("Error");
         }
     }
+
 
 }
 
