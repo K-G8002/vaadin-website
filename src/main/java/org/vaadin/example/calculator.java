@@ -12,9 +12,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-
-
-
 @Route("calc")
 public class calculator extends VerticalLayout {
 
@@ -84,7 +81,6 @@ public class calculator extends VerticalLayout {
 
     }
 
-
     private void onButtonClick(String value) {
         if (value.equals("C")) {
             currentInput.setLength(0);
@@ -112,8 +108,6 @@ public class calculator extends VerticalLayout {
             display.setValue("Error");
         }
     }
-
-
 }
 
 
