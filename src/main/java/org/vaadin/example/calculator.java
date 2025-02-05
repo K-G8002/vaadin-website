@@ -2,8 +2,6 @@ package org.vaadin.example;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -11,11 +9,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.theme.lumo.LumoIcon;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.util.HashMap;
 
 @Route("website")
 public class calculator extends VerticalLayout {
@@ -56,18 +54,14 @@ public class calculator extends VerticalLayout {
         }
         add(display, buttonLayout);
 
-        HorizontalLayout layout = new HorizontalLayout();
-        Icon vaadinIcon = VaadinIcon.PHONE.create();
-        Icon lumoIcon = LumoIcon.PHOTO.create();
-
-        layout.add(lumoIcon, vaadinIcon);
-        add(layout);
-
         Button logoutButton = new Button("Logout", event -> {
             VaadinSession.getCurrent().setAttribute("user", null);
             UI.getCurrent().navigate("login");
         });
         add(logoutButton);
+
+        Button createGroup = new Button("Create Group");
+        add(createGroup);
     }
 
     private void onButtonClick(String value) {
@@ -105,7 +99,8 @@ class login extends VerticalLayout {
     public login() {
         addClassName("centered-content");
         getStyle().set("background-color", "var(--lumo-contrast-5pct)")
-                .set("display", "flex").set("justify-content", "center")
+                .set("display", "flex")
+                .set("justify-content", "center")
                 .set("padding", "var(--lumo-space-l)");
 
         LoginI18n i18n = LoginI18n.createDefault();
@@ -140,12 +135,59 @@ class login extends VerticalLayout {
 
         loginForm.getElement().setAttribute("no-autofocus", "");
         add(loginForm);
+
+        Button registerButton = new Button("Register", event -> UI.getCurrent().navigate("register"));
+        add(registerButton);
     }
 
     private boolean authenticate(String username, String password) {
-        return "KarliBobMarli".equals(username) && "1234".equals(password);
+        return ("Admin".equals(username) && "password".equals(password)) ||
+                ("User".equals(username) && "12345".equals(password));
+    }
+
+}
+
+@Route("register")
+class RegisterView extends VerticalLayout {
+
+    private static HashMap<String, String> userDatabase = new HashMap<>();
+
+    public RegisterView() {
+        addClassName("centered-content");
+        getStyle().set("background-color", "var(--lumo-contrast-5pct)")
+                .set("display", "flex")
+                .set("justify-content", "center")
+                .set("padding", "var(--lumo-space-l)");
+
+        TextField usernameField = new TextField("Username");
+        TextField passwordField = new TextField("Password");
+        Button registerButton = new Button("Register", event -> {
+            String username = usernameField.getValue();
+            String password = passwordField.getValue();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                usernameField.setErrorMessage("Fields cannot be empty");
+                usernameField.setInvalid(true);
+                return;
+            }
+
+            if (userDatabase.containsKey(username)) {
+                usernameField.setErrorMessage("Username already exists");
+                usernameField.setInvalid(true);
+            } else {
+                userDatabase.put(username, password);
+                UI.getCurrent().navigate("login");
+            }
+        });
+
+        add(usernameField, passwordField, registerButton);
+    }
+
+    public static boolean validateUser(String username, String password) {
+        return userDatabase.containsKey(username) && userDatabase.get(username).equals(password);
     }
 }
+
 
 
 
