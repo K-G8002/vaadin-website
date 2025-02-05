@@ -2,8 +2,10 @@ package org.vaadin.example;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -35,7 +37,6 @@ public class calculator extends VerticalLayout {
         currentInput = new StringBuilder();
 
         VerticalLayout buttonLayout = new VerticalLayout();
-
         String[][] buttons = {
                 {"7", "8", "9", "/"},
                 {"4", "5", "6", "*"},
@@ -55,13 +56,49 @@ public class calculator extends VerticalLayout {
         add(display, buttonLayout);
 
         Button logoutButton = new Button("Logout", event -> {
+            String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
+            if ("Selbsthilfegruppe".equals(currentUser)) {
+                GroupManager.setSelfhilfegruppeLoggedIn(false);
+                GroupManager.clearGroup();
+            }
             VaadinSession.getCurrent().setAttribute("user", null);
             UI.getCurrent().navigate("login");
         });
         add(logoutButton);
 
-        Button createGroup = new Button("Create Group");
-        add(createGroup);
+        String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
+        if ("Selbsthilfegruppe".equals(currentUser)) {
+            // Für den Account "Selbsthilfegruppe" wird ein Gruppen-Erstellungs-Button eingeblendet
+            Button createGroupButton = new Button("Create Group", event -> {
+                String code = GroupManager.createGroup();
+                Notification.show("Gruppe erstellt. Code: " + code);
+            });
+            add(createGroupButton);
+
+            Button showMembers = new Button("Show Group Members", event -> {
+                Notification.show("Gruppenmitglieder: " + GroupManager.getGroupMembers().toString());
+            });
+            add(showMembers);
+        } else {
+            Button joinGroupButton = new Button("Join Group", event -> {
+                // Verwende einen Dialog, um den Code einzugeben
+                Dialog dialog = new Dialog();
+                TextField codeField = new TextField("Gruppen-Code");
+                Button submitButton = new Button("Beitreten", e -> {
+                    String enteredCode = codeField.getValue();
+                    if (GroupManager.joinGroup(enteredCode, currentUser)) {
+                        Notification.show("Erfolgreich der Gruppe beigetreten.");
+                        dialog.close();
+                    } else {
+                        Notification.show("Ungültiger Gruppen-Code.");
+                    }
+                });
+                VerticalLayout dialogLayout = new VerticalLayout(codeField, submitButton);
+                dialog.add(dialogLayout);
+                dialog.open();
+            });
+            add(joinGroupButton);
+        }
     }
 
     private void onButtonClick(String value) {
@@ -104,7 +141,6 @@ class login extends VerticalLayout {
                 .set("padding", "var(--lumo-space-l)");
 
         LoginI18n i18n = LoginI18n.createDefault();
-
         LoginI18n.Form i18nForm = i18n.getForm();
         i18nForm.setTitle("Login");
         i18nForm.setUsername("Username");
@@ -112,7 +148,6 @@ class login extends VerticalLayout {
         i18nForm.setSubmit("Submit");
         i18nForm.setForgotPassword("Unknown Password");
         i18n.setForm(i18nForm);
-
         LoginI18n.ErrorMessage i18nErrorMessage = i18n.getErrorMessage();
         i18nErrorMessage.setTitle("Problem");
         i18nErrorMessage.setMessage("Username or Password is false");
@@ -125,8 +160,20 @@ class login extends VerticalLayout {
             String username = event.getUsername();
             String password = event.getPassword();
 
+            // Wenn der Benutzer "Selbsthilfegruppe" ist, prüfen, ob er bereits angemeldet ist
+            if ("Selbsthilfegruppe".equals(username) && GroupManager.isSelfhilfegruppeLoggedIn()) {
+                loginForm.setError(true);
+                // Optional: Benachrichtigung anzeigen
+                com.vaadin.flow.component.notification.Notification.show("Der Account 'Selbsthilfegruppe' ist bereits angemeldet.");
+                return;
+            }
+
             if (authenticate(username, password)) {
                 VaadinSession.getCurrent().setAttribute("user", username);
+                // Falls der Account "Selbsthilfegruppe" eingeloggt wird, den Status setzen
+                if ("Selbsthilfegruppe".equals(username)) {
+                    GroupManager.setSelfhilfegruppeLoggedIn(true);
+                }
                 UI.getCurrent().navigate("website");
             } else {
                 loginForm.setError(true);
@@ -141,10 +188,9 @@ class login extends VerticalLayout {
     }
 
     private boolean authenticate(String username, String password) {
-        return ("Admin".equals(username) && "password".equals(password)) ||
+        return ("Selbsthilfegruppe".equals(username) && "lol".equals(password)) ||
                 ("User".equals(username) && "12345".equals(password));
     }
-
 }
 
 @Route("register")
@@ -171,6 +217,12 @@ class RegisterView extends VerticalLayout {
                 return;
             }
 
+            if ("Selbsthilfegruppe".equals(username)) {
+                usernameField.setErrorMessage("Dieser Username ist reserviert.");
+                usernameField.setInvalid(true);
+                return;
+            }
+
             if (userDatabase.containsKey(username)) {
                 usernameField.setErrorMessage("Username already exists");
                 usernameField.setInvalid(true);
@@ -187,6 +239,8 @@ class RegisterView extends VerticalLayout {
         return userDatabase.containsKey(username) && userDatabase.get(username).equals(password);
     }
 }
+
+
 
 
 
