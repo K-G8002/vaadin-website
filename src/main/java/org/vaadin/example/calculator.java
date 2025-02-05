@@ -17,7 +17,9 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.HashMap;
 
+
 @Route("website")
+
 public class calculator extends VerticalLayout {
 
     private TextField display;
@@ -64,11 +66,14 @@ public class calculator extends VerticalLayout {
             VaadinSession.getCurrent().setAttribute("user", null);
             UI.getCurrent().navigate("login");
         });
+        logoutButton.getStyle()
+                .set("position", "absolute")
+                .set("bottom", "10px")
+                .set("left", "10px");
         add(logoutButton);
 
         String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
         if ("Selbsthilfegruppe".equals(currentUser)) {
-            // Für den Account "Selbsthilfegruppe" wird ein Gruppen-Erstellungs-Button eingeblendet
             Button createGroupButton = new Button("Create Group", event -> {
                 String code = GroupManager.createGroup();
                 Notification.show("Gruppe erstellt. Code: " + code);
@@ -81,7 +86,6 @@ public class calculator extends VerticalLayout {
             add(showMembers);
         } else {
             Button joinGroupButton = new Button("Join Group", event -> {
-                // Verwende einen Dialog, um den Code einzugeben
                 Dialog dialog = new Dialog();
                 TextField codeField = new TextField("Gruppen-Code");
                 Button submitButton = new Button("Beitreten", e -> {
@@ -130,6 +134,7 @@ public class calculator extends VerticalLayout {
     }
 }
 
+
 @Route("login")
 class login extends VerticalLayout {
 
@@ -160,17 +165,14 @@ class login extends VerticalLayout {
             String username = event.getUsername();
             String password = event.getPassword();
 
-            // Wenn der Benutzer "Selbsthilfegruppe" ist, prüfen, ob er bereits angemeldet ist
             if ("Selbsthilfegruppe".equals(username) && GroupManager.isSelfhilfegruppeLoggedIn()) {
                 loginForm.setError(true);
-                // Optional: Benachrichtigung anzeigen
                 com.vaadin.flow.component.notification.Notification.show("Der Account 'Selbsthilfegruppe' ist bereits angemeldet.");
                 return;
             }
 
             if (authenticate(username, password)) {
                 VaadinSession.getCurrent().setAttribute("user", username);
-                // Falls der Account "Selbsthilfegruppe" eingeloggt wird, den Status setzen
                 if ("Selbsthilfegruppe".equals(username)) {
                     GroupManager.setSelfhilfegruppeLoggedIn(true);
                 }
@@ -192,6 +194,7 @@ class login extends VerticalLayout {
                 ("User".equals(username) && "12345".equals(password));
     }
 }
+
 
 @Route("register")
 class RegisterView extends VerticalLayout {
@@ -231,7 +234,6 @@ class RegisterView extends VerticalLayout {
                 UI.getCurrent().navigate("login");
             }
         });
-
         add(usernameField, passwordField, registerButton);
     }
 
