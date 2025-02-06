@@ -3,6 +3,8 @@ package org.vaadin.example;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
@@ -13,13 +15,9 @@ import com.vaadin.flow.server.VaadinSession;
 
 import java.util.HashMap;
 
-
 @Route("website")
 
 public class Website extends VerticalLayout {
-
-    private TextField display;
-    private StringBuilder currentInput;
 
     public Website() {
         if (VaadinSession.getCurrent().getAttribute("user") == null) {
@@ -28,12 +26,29 @@ public class Website extends VerticalLayout {
         }
         addClassName("centered-content");
 
-        display = new TextField();
-        display.setReadOnly(true);
-        display.setWidth("200px");
+        String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
+
+        String nickname = (String) VaadinSession.getCurrent().getAttribute("nickname");
+        String avatarUrl = (String) VaadinSession.getCurrent().getAttribute("avatar");
+
+        if (nickname != null && avatarUrl != null) {
+            Image Avatar = new Image(avatarUrl, "Avatar");
+            Avatar.setWidth("50px");
+            Avatar.setHeight("50px");
+            Avatar.getStyle()
+                    .set("border-radius", "50%")
+                    .set("position", "absolute")
+                    .set("top", "20px")
+                    .set("right", "20px");
+            add(Avatar);
+
+            add(new Span("Nickname: " + nickname));
+        } else {
+            Button profileSetupButton = new Button("Profil einrichten", event -> UI.getCurrent().navigate("profile"));
+            add(profileSetupButton);
+        }
 
         Button logoutButton = new Button("Logout", event -> {
-            String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
             if ("Selbsthilfegruppe".equals(currentUser)) {
                 GroupManager.setSelfhilfegruppeLoggedIn(false);
                 GroupManager.clearGroup();
@@ -41,14 +56,16 @@ public class Website extends VerticalLayout {
             VaadinSession.getCurrent().setAttribute("user", null);
             UI.getCurrent().navigate("login");
         });
+        logoutButton.setHeight("50px");
+        logoutButton.setWidth("20px");
         logoutButton.getStyle()
                 .set("position", "absolute")
                 .set("bottom", "10px")
                 .set("left", "10px");
         add(logoutButton);
 
-        String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
         if ("Selbsthilfegruppe".equals(currentUser)) {
+            // "Create Group"-Button nur für den Account "Selbsthilfegruppe"
             Button createGroupButton = new Button("Create Group", event -> {
                 String code = GroupManager.createGroup();
                 Notification.show("Gruppe erstellt. Code: " + code);
@@ -60,7 +77,13 @@ public class Website extends VerticalLayout {
             });
             add(showMembers);
         } else {
+            // Für andere Benutzer: "Join Group"-Button
             Button joinGroupButton = new Button("Join Group", event -> {
+                // Vor dem Beitritt überprüfen, ob Profilinformationen vorhanden sind
+                if (nickname == null || avatarUrl == null) {
+                    Notification.show("Bitte richte zuerst dein Profil (Avatar und Nickname) ein.");
+                    return;
+                }
                 Dialog dialog = new Dialog();
                 TextField codeField = new TextField("Gruppen-Code");
                 Button submitButton = new Button("Beitreten", e -> {
@@ -72,15 +95,13 @@ public class Website extends VerticalLayout {
                         Notification.show("Ungültiger Gruppen-Code.");
                     }
                 });
-                VerticalLayout dialogLayout = new VerticalLayout(codeField, submitButton);
-                dialog.add(dialogLayout);
+                dialog.add(new VerticalLayout(codeField, submitButton));
                 dialog.open();
             });
             add(joinGroupButton);
         }
     }
 }
-
 
 @Route("login")
 class login extends VerticalLayout {
@@ -188,6 +209,8 @@ class RegisterView extends VerticalLayout {
         return userDatabase.containsKey(username) && userDatabase.get(username).equals(password);
     }
 }
+
+
 
 
 
