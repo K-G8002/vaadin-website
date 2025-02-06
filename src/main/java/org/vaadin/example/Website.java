@@ -6,7 +6,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
@@ -35,27 +34,6 @@ public class Website extends VerticalLayout {
         display = new TextField();
         display.setReadOnly(true);
         display.setWidth("200px");
-
-        currentInput = new StringBuilder();
-
-        VerticalLayout buttonLayout = new VerticalLayout();
-        String[][] buttons = {
-                {"7", "8", "9", "/"},
-                {"4", "5", "6", "*"},
-                {"1", "2", "3", "-"},
-                {"0", "C", "=", "+"}
-        };
-
-        for (String[] row : buttons) {
-            HorizontalLayout rowLayout = new HorizontalLayout();
-            for (String text : row) {
-                Button button = new Button(text, event -> onButtonClick(text));
-                button.setWidth("50px");
-                rowLayout.add(button);
-            }
-            buttonLayout.add(rowLayout);
-        }
-        add(display, buttonLayout);
 
         Button logoutButton = new Button("Logout", event -> {
             String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
