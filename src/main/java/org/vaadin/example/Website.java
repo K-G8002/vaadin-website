@@ -20,12 +20,12 @@ import java.util.HashMap;
 
 @Route("website")
 
-public class calculator extends VerticalLayout {
+public class Website extends VerticalLayout {
 
     private TextField display;
     private StringBuilder currentInput;
 
-    public calculator() {
+    public Website() {
         if (VaadinSession.getCurrent().getAttribute("user") == null) {
             UI.getCurrent().navigate("login");
             return;
