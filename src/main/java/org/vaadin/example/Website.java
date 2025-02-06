@@ -8,77 +8,87 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 @Route("website")
 public class Website extends VerticalLayout {
+
+    private static final List<String> avatarUrls = Arrays.asList(
+            "https://example.com/avatar1.png",
+            "https://example.com/avatar2.png",
+            "https://example.com/avatar3.png"
+    );
+
+    private int currentAvatarIndex = 0;
 
     public Website() {
         if (VaadinSession.getCurrent().getAttribute("user") == null) {
             UI.getCurrent().navigate("login");
             return;
         }
+
         addClassName("centered-content");
 
-        String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
         String nickname = (String) VaadinSession.getCurrent().getAttribute("nickname");
         String avatarUrl = (String) VaadinSession.getCurrent().getAttribute("avatar");
 
         if (nickname == null || avatarUrl == null) {
+            // Avatar-Auswahl anzeigen
+            Image avatarImage = new Image(avatarUrls.get(currentAvatarIndex), "Avatar");
+            avatarImage.setWidth("100px");
+            avatarImage.setHeight("100px");
+            avatarImage.getStyle().set("border-radius", "50%");
+
+            Button previousButton = new Button("<", event -> {
+                currentAvatarIndex = (currentAvatarIndex - 1 + avatarUrls.size()) % avatarUrls.size();
+                avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
+            });
+
+            Button nextButton = new Button(">", event -> {
+                currentAvatarIndex = (currentAvatarIndex + 1) % avatarUrls.size();
+                avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
+            });
+
             TextField nicknameField = new TextField("Nickname");
-            TextField avatarUrlField = new TextField("Avatar Url");
+            nicknameField.setPlaceholder("Wähle einen Nickname...");
 
-            Button saveButton = new Button("speichern", event -> {
-                String newNickname = nicknameField.getValue();
-                String newAvatarUrl = avatarUrlField.getValue();
-
-                if (newNickname.isEmpty() || newAvatarUrl.isEmpty()) {
-                    Notification.show("Bitte füööe beide Felder aus.");
+            Button saveButton = new Button("Speichern", event -> {
+                String selectedNickname = nicknameField.getValue();
+                if (selectedNickname.isEmpty()) {
+                    Notification.show("Bitte gib einen Nickname ein.");
                     return;
                 }
-
-                VaadinSession.getCurrent().setAttribute("nickname", newNickname);
-                VaadinSession.getCurrent().setAttribute("avatar", newAvatarUrl);
-
+                VaadinSession.getCurrent().setAttribute("nickname", selectedNickname);
+                VaadinSession.getCurrent().setAttribute("avatar", avatarUrls.get(currentAvatarIndex));
                 UI.getCurrent().getPage().reload();
             });
 
-            add(nicknameField, avatarUrlField, saveButton);
-
-
+            add(new HorizontalLayout(previousButton, avatarImage, nextButton));
+            add(nicknameField, saveButton);
         } else {
-            Image Avatar = new Image(avatarUrl, "Avatar");
-            Avatar.setWidth("50px");
-            Avatar.setHeight("50px");
-            Avatar.getStyle()
-                    .set("border-radius", "50%")
-                    .set("position", "absolute")
-                    .set("top", "20px")
-                    .set("right", "20px");
-            add(Avatar);
+            // Avatar und Nickname anzeigen, wenn sie bereits gesetzt sind
+            Image avatarImage = new Image(avatarUrl, "Avatar");
+            avatarImage.setWidth("100px");
+            avatarImage.setHeight("100px");
+            avatarImage.getStyle().set("border-radius", "50%");
 
-            add(new Span("Nickname: " + nickname));
+            Span nicknameSpan = new Span("Nickname: " + nickname);
+
+            add(avatarImage, nicknameSpan);
         }
 
         Button logoutButton = new Button("Logout", event -> {
-            if ("Selbsthilfegruppe".equals(currentUser)) {
-                GroupManager.setSelfhilfegruppeLoggedIn(false);
-                GroupManager.clearGroup();
-            }
             VaadinSession.getCurrent().setAttribute("user", null);
             UI.getCurrent().navigate("login");
         });
-        logoutButton.setHeight("50px");
-        logoutButton.setWidth("20px");
-        logoutButton.getStyle()
-                .set("position", "absolute")
-                .set("bottom", "10px")
-                .set("left", "10px");
         add(logoutButton);
 
         if ("Selbsthilfegruppe".equals(currentUser)) {
