@@ -11,9 +11,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.util.HashMap;
 
 
@@ -80,34 +77,6 @@ public class Website extends VerticalLayout {
                 dialog.open();
             });
             add(joinGroupButton);
-        }
-    }
-
-    private void onButtonClick(String value) {
-        if (value.equals("C")) {
-            currentInput.setLength(0);
-            display.setValue("");
-        } else if (value.equals("=")) {
-            calculateResult();
-        } else {
-            currentInput.append(value);
-            display.setValue(currentInput.toString());
-        }
-    }
-
-    private void calculateResult() {
-        try {
-            ScriptEngineManager mgr = new ScriptEngineManager();
-            ScriptEngine engine = mgr.getEngineByName("JavaScript");
-            String expression = currentInput.toString();
-            System.out.println("Expression: " + expression);
-            String result = engine.eval(expression).toString();
-            display.setValue(result);
-            currentInput.setLength(0);
-            currentInput.append(result);
-        } catch (ScriptException e) {
-            e.printStackTrace();
-            display.setValue("Error");
         }
     }
 }
