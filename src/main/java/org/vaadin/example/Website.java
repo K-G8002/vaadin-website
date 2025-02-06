@@ -16,7 +16,6 @@ import com.vaadin.flow.server.VaadinSession;
 import java.util.HashMap;
 
 @Route("website")
-
 public class Website extends VerticalLayout {
 
     public Website() {
@@ -27,11 +26,32 @@ public class Website extends VerticalLayout {
         addClassName("centered-content");
 
         String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
-
         String nickname = (String) VaadinSession.getCurrent().getAttribute("nickname");
         String avatarUrl = (String) VaadinSession.getCurrent().getAttribute("avatar");
 
-        if (nickname != null && avatarUrl != null) {
+        if (nickname == null || avatarUrl == null) {
+            TextField nicknameField = new TextField("Nickname");
+            TextField avatarUrlField = new TextField("Avatar Url");
+
+            Button saveButton = new Button("speichern", event -> {
+                String newNickname = nicknameField.getValue();
+                String newAvatarUrl = avatarUrlField.getValue();
+
+                if (newNickname.isEmpty() || newAvatarUrl.isEmpty()) {
+                    Notification.show("Bitte füööe beide Felder aus.");
+                    return;
+                }
+
+                VaadinSession.getCurrent().setAttribute("nickname", newNickname);
+                VaadinSession.getCurrent().setAttribute("avatar", newAvatarUrl);
+
+                UI.getCurrent().getPage().reload();
+            });
+
+            add(nicknameField, avatarUrlField, saveButton);
+
+
+        } else {
             Image Avatar = new Image(avatarUrl, "Avatar");
             Avatar.setWidth("50px");
             Avatar.setHeight("50px");
@@ -43,9 +63,6 @@ public class Website extends VerticalLayout {
             add(Avatar);
 
             add(new Span("Nickname: " + nickname));
-        } else {
-            Button profileSetupButton = new Button("Profil einrichten", event -> UI.getCurrent().navigate("profile"));
-            add(profileSetupButton);
         }
 
         Button logoutButton = new Button("Logout", event -> {
