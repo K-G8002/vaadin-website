@@ -22,9 +22,13 @@ import java.util.List;
 public class Website extends VerticalLayout {
 
     private static final List<String> avatarUrls = Arrays.asList(
-            "https://example.com/avatar1.png",
-            "https://example.com/avatar2.png",
-            "https://example.com/avatar3.png"
+            "https://www.gravatar.com/avatar/placeholder?s=100&d=identicon",
+            "https://www.gravatar.com/avatar/placeholder?s=100&d=monsterid",
+            "https://www.gravatar.com/avatar/placeholder?s=100&d=retro",
+            "https://www.gravatar.com/avatar/placeholder?s=100&d=wavatar",
+            "https://www.gravatar.com/avatar/placeholder?s=100&d=robohash",
+            "https://www.gravatar.com/avatar/placeholder?s=100&d=mp"
+
     );
 
     private int currentAvatarIndex = 0;
@@ -36,7 +40,7 @@ public class Website extends VerticalLayout {
         }
 
         addClassName("centered-content");
-
+        String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
         String nickname = (String) VaadinSession.getCurrent().getAttribute("nickname");
         String avatarUrl = (String) VaadinSession.getCurrent().getAttribute("avatar");
 
