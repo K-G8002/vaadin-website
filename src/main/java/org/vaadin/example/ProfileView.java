@@ -15,10 +15,18 @@ import java.util.Arrays;
 import java.util.List;
 
 @Route("profile")
+
 public class ProfileView extends VerticalLayout {
 
     public ProfileView() {
         addClassName("centered-content");
+        String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
+        if ("Selbsthilfegruppe".equals(currentUser)) {
+            Notification.show("Der Admin-Account kann sein Profil nicht ändern");
+            UI.getCurrent().navigate("website");
+            return;
+        }
+
         add(new H1("Profil einrichten"));
 
         // Nickname-Feld

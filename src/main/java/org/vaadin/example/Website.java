@@ -127,7 +127,7 @@ class login extends VerticalLayout {
         i18n.setErrorMessage(i18nErrorMessage);
 
         LoginForm loginForm = new LoginForm();
-        loginForm.setI18n(i18n);
+        loginForm.setI18n(createLoginI18n());
 
         loginForm.addLoginListener(event -> {
             String username = event.getUsername();
@@ -141,8 +141,14 @@ class login extends VerticalLayout {
 
             if (authenticate(username, password)) {
                 VaadinSession.getCurrent().setAttribute("user", username);
+
                 if ("Selbsthilfegruppe".equals(username)) {
+                    VaadinSession.getCurrent().setAttribute("nickname", "Admin");
+                    VaadinSession.getCurrent().setAttribute("avatar", "https://www.example.com/admin-avatar.png");
                     GroupManager.setSelfhilfegruppeLoggedIn(true);
+                } else {
+                    VaadinSession.getCurrent().setAttribute("nickname", null);
+                    VaadinSession.getCurrent().setAttribute("avatar", null);
                 }
                 UI.getCurrent().navigate("website");
             } else {
@@ -160,6 +166,22 @@ class login extends VerticalLayout {
     private boolean authenticate(String username, String password) {
         return ("Selbsthilfegruppe".equals(username) && "lol".equals(password)) ||
                 ("User".equals(username) && "12345".equals(password));
+    }
+
+    private LoginI18n createLoginI18n() {
+        LoginI18n i18n = LoginI18n.createDefault();
+        LoginI18n.Form i18nForm = i18n.getForm();
+        i18nForm.setTitle("Login");
+        i18nForm.setUsername("Username");
+        i18nForm.setPassword("Password");
+        i18nForm.setSubmit("Submit");
+        i18nForm.setForgotPassword("Unknown Password");
+        i18n.setForm(i18nForm);
+        LoginI18n.ErrorMessage i18nErrorMessage = i18n.getErrorMessage();
+        i18nErrorMessage.setTitle("Problem");
+        i18nErrorMessage.setMessage("Username or Password is false");
+        i18n.setErrorMessage(i18nErrorMessage);
+        return i18n;
     }
 }
 
