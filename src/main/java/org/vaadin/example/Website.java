@@ -28,7 +28,6 @@ public class Website extends VerticalLayout {
             "https://www.gravatar.com/avatar/placeholder?s=100&d=wavatar",
             "https://www.gravatar.com/avatar/placeholder?s=100&d=robohash",
             "https://www.gravatar.com/avatar/placeholder?s=100&d=mp"
-
     );
 
     private int currentAvatarIndex = 0;
@@ -45,7 +44,6 @@ public class Website extends VerticalLayout {
         String avatarUrl = (String) VaadinSession.getCurrent().getAttribute("avatar");
 
         if (nickname == null || avatarUrl == null) {
-            // Avatar-Auswahl anzeigen
             Image avatarImage = new Image(avatarUrls.get(currentAvatarIndex), "Avatar");
             avatarImage.setWidth("100px");
             avatarImage.setHeight("100px");
@@ -78,7 +76,6 @@ public class Website extends VerticalLayout {
             add(new HorizontalLayout(previousButton, avatarImage, nextButton));
             add(nicknameField, saveButton);
         } else {
-            // Avatar und Nickname anzeigen, wenn sie bereits gesetzt sind
             Image avatarImage = new Image(avatarUrl, "Avatar");
             avatarImage.setWidth("100px");
             avatarImage.setHeight("100px");
@@ -96,7 +93,6 @@ public class Website extends VerticalLayout {
         add(logoutButton);
 
         if ("Selbsthilfegruppe".equals(currentUser)) {
-            // "Create Group"-Button nur für den Account "Selbsthilfegruppe"
             Button createGroupButton = new Button("Create Group", event -> {
                 String code = GroupManager.createGroup();
                 Notification.show("Gruppe erstellt. Code: " + code);
@@ -108,9 +104,7 @@ public class Website extends VerticalLayout {
             });
             add(showMembers);
         } else {
-            // Für andere Benutzer: "Join Group"-Button
             Button joinGroupButton = new Button("Join Group", event -> {
-                // Vor dem Beitritt überprüfen, ob Profilinformationen vorhanden sind
                 if (nickname == null || avatarUrl == null) {
                     Notification.show("Bitte richte zuerst dein Profil (Avatar und Nickname) ein.");
                     return;
