@@ -45,8 +45,8 @@ public class Website extends VerticalLayout {
 
         if (nickname == null || avatarUrl == null) {
             Image avatarImage = new Image(avatarUrls.get(currentAvatarIndex), "Avatar");
-            avatarImage.setWidth("100px");
-            avatarImage.setHeight("100px");
+            avatarImage.setWidth("150px");
+            avatarImage.setHeight("150px");
             avatarImage.getStyle().set("border-radius", "50%");
 
             Button previousButton = new Button("<", event -> {
@@ -60,9 +60,9 @@ public class Website extends VerticalLayout {
             });
 
             TextField nicknameField = new TextField("Nickname");
-            nicknameField.setPlaceholder("Wähle einen Nickname...");
+            nicknameField.setPlaceholder("LustigerName");
 
-            Button saveButton = new Button("Speichern", event -> {
+            /*Button saveButton = new Button("Speichern", event -> {
                 String selectedNickname = nicknameField.getValue();
                 if (selectedNickname.isEmpty()) {
                     Notification.show("Bitte gib einen Nickname ein.");
@@ -71,10 +71,10 @@ public class Website extends VerticalLayout {
                 VaadinSession.getCurrent().setAttribute("nickname", selectedNickname);
                 VaadinSession.getCurrent().setAttribute("avatar", avatarUrls.get(currentAvatarIndex));
                 UI.getCurrent().getPage().reload();
-            });
+            });*/
 
             add(new HorizontalLayout(previousButton, avatarImage, nextButton));
-            add(nicknameField, saveButton);
+            add(nicknameField);              /*, saveButton);*/
         } else {
             Image avatarImage = new Image(avatarUrl, "Avatar");
             avatarImage.setWidth("100px");
@@ -169,7 +169,7 @@ class login extends VerticalLayout {
 
                 if ("Selbsthilfegruppe".equals(username)) {
                     VaadinSession.getCurrent().setAttribute("nickname", "Admin");
-                    VaadinSession.getCurrent().setAttribute("avatar", "https://www.example.com/admin-avatar.png");
+                    VaadinSession.getCurrent().setAttribute("avatar", "https://www.gravatar.com/avatar/placeholder?s=100&d=mp");
                     GroupManager.setSelfhilfegruppeLoggedIn(true);
                 } else {
                     VaadinSession.getCurrent().setAttribute("nickname", null);
