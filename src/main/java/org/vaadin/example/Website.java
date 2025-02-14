@@ -30,15 +30,17 @@ public class Website extends VerticalLayout {
     private int currentAvatarIndex = 0;
 
     public Website() {
-        if (VaadinSession.getCurrent().getAttribute("user") == null) {
-            UI.getCurrent().navigate("login");
+        addClassName("centered-content");
+
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session == null) {
+            Notification.show("Fehler: Keine aktive Sitzung.");
             return;
         }
 
-        addClassName("centered-content");
-        String currentUser = (String) VaadinSession.getCurrent().getAttribute("user");
-        String nickname = (String) VaadinSession.getCurrent().getAttribute("nickname");
-        String avatarUrl = (String) VaadinSession.getCurrent().getAttribute("avatar");
+        String currentUser = (String) session.getAttribute("user");
+        String nickname = (String) session.getAttribute("nickname");
+        String avatarUrl = (String) session.getAttribute("avatar");
 
         if (nickname == null || avatarUrl == null) {
             Image avatarImage = new Image(avatarUrls.get(currentAvatarIndex), "Avatar");
@@ -65,13 +67,13 @@ public class Website extends VerticalLayout {
                     Notification.show("Bitte gib einen Nickname ein.");
                     return;
                 }
-                VaadinSession.getCurrent().setAttribute("nickname", selectedNickname);
-                VaadinSession.getCurrent().setAttribute("avatar", avatarUrls.get(currentAvatarIndex));
+                session.setAttribute("nickname", selectedNickname);
+                session.setAttribute("avatar", avatarUrls.get(currentAvatarIndex));
                 UI.getCurrent().getPage().reload();
             });
 
             add(new HorizontalLayout(previousButton, avatarImage, nextButton));
-            add(nicknameField);              /*, saveButton);*/
+            add(nicknameField, saveButton);
         } else {
             Image avatarImage = new Image(avatarUrl, "Avatar");
             avatarImage.setWidth("100px");
@@ -83,47 +85,43 @@ public class Website extends VerticalLayout {
             add(avatarImage, nicknameSpan);
         }
 
-        Button logoutButton = new Button("Logout", event -> {
-            VaadinSession.getCurrent().setAttribute("user", null);
-            UI.getCurrent().navigate("login");
-        });
-        add(logoutButton);
-
-        if ("Selbsthilfegruppe".equals(currentUser)) {
-            Button createGroupButton = new Button("Create Group", event -> {
+        Button createGroupButton = new Button("Create Group", event -> {
                 String code = GroupManager.createGroup();
                 Notification.show("Gruppe erstellt. Code: " + code);
-            });
-            add(createGroupButton);
+        });
+        add(createGroupButton);
 
-            Button showMembers = new Button("Show Group Members", event -> {
-                Notification.show("Gruppenmitglieder: " + GroupManager.getGroupMembers().toString());
-            });
-            add(showMembers);
-        } else {
-            Button joinGroupButton = new Button("Join Group", event -> {
-                if (nickname == null || avatarUrl == null) {
-                    Notification.show("Bitte richte zuerst dein Profil (Avatar und Nickname) ein.");
-                    return;
+        Button showMembers = new Button("Show Group Members", event -> {
+            Notification.show("Gruppenmitglieder: " + GroupManager.getGroupMembers().toString());
+        });
+        add(showMembers);
+
+        Button joinGroupButton = new Button("Join Group", event -> {
+            if (nickname == null || avatarUrl == null) {
+                Notification.show("Bitte richte zuerst dein Profil (Avatar und Nickname) ein.");
+                return;
+            }
+            Dialog dialog = new Dialog();
+            TextField codeField = new TextField("Gruppen-Code");
+            Button submitButton = new Button("Beitreten", e -> {
+                String enteredCode = codeField.getValue();
+                if (GroupManager.joinGroup(enteredCode, currentUser)) {
+                    Notification.show("Erfolgreich der Gruppe beigetreten.");
+                    dialog.close();
+                } else {
+                    Notification.show("Ungültiger Gruppen-Code.");
                 }
-                Dialog dialog = new Dialog();
-                TextField codeField = new TextField("Gruppen-Code");
-                Button submitButton = new Button("Beitreten", e -> {
-                    String enteredCode = codeField.getValue();
-                    if (GroupManager.joinGroup(enteredCode, currentUser)) {
-                        Notification.show("Erfolgreich der Gruppe beigetreten.");
-                        dialog.close();
-                    } else {
-                        Notification.show("Ungültiger Gruppen-Code.");
-                    }
-                });
-                dialog.add(new VerticalLayout(codeField, submitButton));
-                dialog.open();
             });
-            add(joinGroupButton);
-        }
+            dialog.add(new VerticalLayout(codeField, submitButton));
+            dialog.open();
+        });
+        add(joinGroupButton);
     }
 }
+
+
+
+
 
 /*@Route("login")
 class login extends VerticalLayout {
