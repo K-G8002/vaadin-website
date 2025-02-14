@@ -28,62 +28,60 @@ public class Website extends VerticalLayout {
     );
 
     private int currentAvatarIndex = 0;
+    private String nickname;
+    private String avatarUrl;
 
     public Website() {
         addClassName("centered-content");
 
-        VaadinSession session = VaadinSession.getCurrent();
-        if (session == null) {
-            Notification.show("Fehler: Keine aktive Sitzung.");
-            return;
-        }
+        Image avatarImage = new Image(avatarUrls.get(currentAvatarIndex), "Avatar");
+        avatarImage.setWidth("150px");
+        avatarImage.setHeight("150px");
+        avatarImage.getStyle().set("border-radius", "50%");
 
-        String currentUser = (String) session.getAttribute("user");
-        String nickname = (String) session.getAttribute("nickname");
-        String avatarUrl = (String) session.getAttribute("avatar");
+        Button previousButton = new Button("<", event -> {
+            currentAvatarIndex = (currentAvatarIndex - 1 + avatarUrls.size()) % avatarUrls.size();
+            avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
+        });
 
-        if (nickname == null || avatarUrl == null) {
-            Image avatarImage = new Image(avatarUrls.get(currentAvatarIndex), "Avatar");
-            avatarImage.setWidth("150px");
-            avatarImage.setHeight("150px");
-            avatarImage.getStyle().set("border-radius", "50%");
+        Button nextButton = new Button(">", event -> {
+            currentAvatarIndex = (currentAvatarIndex + 1) % avatarUrls.size();
+            avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
+        });
 
-            Button previousButton = new Button("<", event -> {
-                currentAvatarIndex = (currentAvatarIndex - 1 + avatarUrls.size()) % avatarUrls.size();
-                avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
-            });
+        add(new HorizontalLayout(previousButton, avatarImage, nextButton));
 
-            Button nextButton = new Button(">", event -> {
-                currentAvatarIndex = (currentAvatarIndex + 1) % avatarUrls.size();
-                avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
-            });
-            add(new HorizontalLayout(previousButton, avatarImage, nextButton));
+        TextField nicknameField = new TextField("Nickname");
+        nicknameField.setPlaceholder("LustigerName");
+        add(nicknameField);
 
-            TextField nicknameField = new TextField("Nickname");
-            nicknameField.setPlaceholder("LustigerName");
-            add(nicknameField);
+        Button saveProfileButton = new Button("Profil speichern", event -> {
+            nickname = nicknameField.getValue();
+            avatarUrl = avatarUrls.get(currentAvatarIndex);
+            if (nickname.isEmpty()) {
+                Notification.show("Bitte gib einen Nickname ein.");
+                return;
+            }
+            Notification.show("Profil gespeichert!");
+        });
 
-        } else {
-            Image avatarImage = new Image(avatarUrl, "Avatar");
-            avatarImage.setWidth("100px");
-            avatarImage.setHeight("100px");
-            avatarImage.getStyle().set("border-radius", "50%");
-
-            Span nicknameSpan = new Span("Nickname: " + nickname);
-
-            add(avatarImage, nicknameSpan);
-        }
+        add(saveProfileButton);
 
         Button createGroupButton = new Button("Create Group", event -> {
             if (nickname == null || avatarUrl == null) {
                 Notification.show("Bitte richte zuerst dein Profil (Avatar und Nickname) ein.");
                 return;
             }
-                String code = GroupManager.createGroup();
+            VaadinSession session = VaadinSession.getCurrent();
+            if (session == null) {
+                Notification.show("Fehler: Keine aktive Sitzung.");
+                return;
+            }
+            String code = GroupManager.createGroup();
             session.setAttribute("groupCode", code);
             UI.getCurrent().navigate("lobby");
-            //Notification.show("Gruppe erstellt. Code: " + code);
         });
+
         add(createGroupButton);
 
         Button joinGroupButton = new Button("Join Group", event -> {
@@ -95,8 +93,11 @@ public class Website extends VerticalLayout {
             TextField codeField = new TextField("Gruppen-Code");
             Button submitButton = new Button("Beitreten", e -> {
                 String enteredCode = codeField.getValue();
-                if (GroupManager.joinGroup(enteredCode, currentUser)) {
+                if (GroupManager.joinGroup(enteredCode, nickname)) {
+                    VaadinSession session = VaadinSession.getCurrent();
+                    session.setAttribute("groupCode", enteredCode);
                     Notification.show("Erfolgreich der Gruppe beigetreten.");
+                    UI.getCurrent().navigate("lobby");
                     dialog.close();
                 } else {
                     Notification.show("Ungültiger Gruppen-Code.");
@@ -105,35 +106,40 @@ public class Website extends VerticalLayout {
             dialog.add(new VerticalLayout(codeField, submitButton));
             dialog.open();
         });
+
         add(joinGroupButton);
     }
 }
 
 @Route("lobby")
-class lobby extends VerticalLayout {
+class Lobby extends VerticalLayout {
 
-    public lobby() {
+    public Lobby() {
         addClassName("centered-content");
 
         VaadinSession session = VaadinSession.getCurrent();
         if (session == null) {
             Notification.show("Fehler: Keine aktive Sitzung.");
+            UI.getCurrent().navigate("website");
             return;
         }
+
         String groupCode = (String) session.getAttribute("groupCode");
-        if (groupCode != null) {
-            add(new Span("Dein Gruppen-Code: " + groupCode));
-        } else {
-            add(new Span("Kein Gruppen-Code gefunden."));
+        if (groupCode == null) {
+            Notification.show("Du bist keiner Gruppe zugeordnet.");
+            UI.getCurrent().navigate("website");
+            return;
         }
+
+        add(new Span("Dein Gruppen-Code: " + groupCode));
+
         Button showMembers = new Button("Show Group Members", event -> {
             Notification.show("Gruppenmitglieder: " + GroupManager.getGroupMembers().toString());
         });
+
         add(showMembers);
     }
 }
-
-
 
 
 
