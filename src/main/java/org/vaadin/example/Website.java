@@ -5,8 +5,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.login.LoginForm;
-import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,7 +13,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 @Route("website")
@@ -62,7 +59,7 @@ public class Website extends VerticalLayout {
             TextField nicknameField = new TextField("Nickname");
             nicknameField.setPlaceholder("LustigerName");
 
-            /*Button saveButton = new Button("Speichern", event -> {
+            Button saveButton = new Button("Speichern", event -> {
                 String selectedNickname = nicknameField.getValue();
                 if (selectedNickname.isEmpty()) {
                     Notification.show("Bitte gib einen Nickname ein.");
@@ -71,7 +68,7 @@ public class Website extends VerticalLayout {
                 VaadinSession.getCurrent().setAttribute("nickname", selectedNickname);
                 VaadinSession.getCurrent().setAttribute("avatar", avatarUrls.get(currentAvatarIndex));
                 UI.getCurrent().getPage().reload();
-            });*/
+            });
 
             add(new HorizontalLayout(previousButton, avatarImage, nextButton));
             add(nicknameField);              /*, saveButton);*/
@@ -128,7 +125,7 @@ public class Website extends VerticalLayout {
     }
 }
 
-@Route("login")
+/*@Route("login")
 class login extends VerticalLayout {
 
     public login() {
@@ -255,7 +252,7 @@ class RegisterView extends VerticalLayout {
     public static boolean validateUser(String username, String password) {
         return userDatabase.containsKey(username) && userDatabase.get(username).equals(password);
     }
-}
+}*/
 
 
 
