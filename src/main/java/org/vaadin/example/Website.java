@@ -1,5 +1,6 @@
 package org.vaadin.example;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Image;
@@ -74,15 +75,16 @@ public class Website extends VerticalLayout {
         }
 
         Button createGroupButton = new Button("Create Group", event -> {
+            if (nickname == null || avatarUrl == null) {
+                Notification.show("Bitte richte zuerst dein Profil (Avatar und Nickname) ein.");
+                return;
+            }
                 String code = GroupManager.createGroup();
-                Notification.show("Gruppe erstellt. Code: " + code);
+            session.setAttribute("groupCode", code);
+            UI.getCurrent().navigate("lobby");
+            //Notification.show("Gruppe erstellt. Code: " + code);
         });
         add(createGroupButton);
-
-        Button showMembers = new Button("Show Group Members", event -> {
-            Notification.show("Gruppenmitglieder: " + GroupManager.getGroupMembers().toString());
-        });
-        add(showMembers);
 
         Button joinGroupButton = new Button("Join Group", event -> {
             if (nickname == null || avatarUrl == null) {
@@ -106,6 +108,31 @@ public class Website extends VerticalLayout {
         add(joinGroupButton);
     }
 }
+
+@Route("lobby")
+class lobby extends VerticalLayout {
+
+    public lobby() {
+        addClassName("centered-content");
+
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session == null) {
+            Notification.show("Fehler: Keine aktive Sitzung.");
+            return;
+        }
+        String groupCode = (String) session.getAttribute("groupCode");
+        if (groupCode != null) {
+            add(new Span("Dein Gruppen-Code: " + groupCode));
+        } else {
+            add(new Span("Kein Gruppen-Code gefunden."));
+        }
+        Button showMembers = new Button("Show Group Members", event -> {
+            Notification.show("Gruppenmitglieder: " + GroupManager.getGroupMembers().toString());
+        });
+        add(showMembers);
+    }
+}
+
 
 
 
