@@ -8,6 +8,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
@@ -30,6 +31,8 @@ public class Website extends VerticalLayout {
     private int currentAvatarIndex = 0;
     private String nickname;
     private String avatarUrl;
+    private String BodyWeight;
+    private String Gender;
 
     public Website() {
         addClassName("centered-content");
@@ -52,14 +55,38 @@ public class Website extends VerticalLayout {
         add(new HorizontalLayout(previousButton, avatarImage, nextButton));
 
         TextField nicknameField = new TextField("Nickname");
-        nicknameField.setPlaceholder("LustigerName");
+        nicknameField.setPlaceholder("Name");
         add(nicknameField);
+
+        TextField BodyWeightField = new TextField("Body Weight");
+        BodyWeightField.setPlaceholder("Körpergewicht");
+        add(BodyWeightField);
+
+        Select<String> GenderSelector = new Select<>();
+        GenderSelector.setLabel("Gender");
+        GenderSelector.setItems("Männlich", "Weiblich");
+        GenderSelector.setValue("Männlich");
+        add(GenderSelector);
 
         Button saveProfileButton = new Button("Profil speichern", event -> {
             nickname = nicknameField.getValue();
             avatarUrl = avatarUrls.get(currentAvatarIndex);
+            BodyWeight = BodyWeightField.getValue();
+            Gender = GenderSelector.getValue();
             if (nickname.isEmpty()) {
-                Notification.show("Bitte gib einen Nickname ein.");
+                Notification.show("Bitte gib einen Namen ein.");
+                return;
+            }
+            if (avatarUrl.isEmpty()) {
+                Notification.show("Bitte wähle ein Avatar aus.");
+                return;
+            }
+            if (BodyWeight.isEmpty()) {
+                Notification.show("Bitte gib dein Körpergewicht an.");
+                return;
+            }
+            if (Gender.isEmpty()) {
+                Notification.show("Bitte gib dein Geschlecht an.");
                 return;
             }
             Notification.show("Profil gespeichert!");
@@ -68,8 +95,8 @@ public class Website extends VerticalLayout {
         add(saveProfileButton);
 
         Button createGroupButton = new Button("Create Group", event -> {
-            if (nickname == null || avatarUrl == null) {
-                Notification.show("Bitte richte zuerst dein Profil (Avatar und Nickname) ein.");
+            if (nickname == null || avatarUrl == null || BodyWeight == null || Gender == null) {
+                Notification.show("Bitte richte zuerst dein Profil ein.");
                 return;
             }
             VaadinSession session = VaadinSession.getCurrent();
@@ -85,8 +112,8 @@ public class Website extends VerticalLayout {
         add(createGroupButton);
 
         Button joinGroupButton = new Button("Join Group", event -> {
-            if (nickname == null || avatarUrl == null) {
-                Notification.show("Bitte richte zuerst dein Profil (Avatar und Nickname) ein.");
+            if (nickname == null || avatarUrl == null || BodyWeight == null || Gender == null) {
+                Notification.show("Bitte richte zuerst dein Profil ein.");
                 return;
             }
             Dialog dialog = new Dialog();
