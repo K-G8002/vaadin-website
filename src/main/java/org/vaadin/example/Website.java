@@ -157,17 +157,19 @@ class Lobby extends VerticalLayout {
             UI.getCurrent().navigate("website");
             return;
         }
-
         add(new Span("Dein Gruppen-Code: " + groupCode));
 
         Button showMembers = new Button("Show Group Members", event -> {
             Notification.show("Gruppenmitglieder: " + GroupManager.getGroupMembers().toString());
         });
-
         add(showMembers);
+
+        Button leaveGroupButton = new Button("Leave group", event -> {
+            UI.getCurrent().navigate("website");
+        });
+        add(leaveGroupButton);
     }
 }
-
 
 
 
