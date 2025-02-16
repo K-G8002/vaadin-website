@@ -91,7 +91,6 @@ public class Website extends VerticalLayout {
             }
             Notification.show("Profil gespeichert!");
         });
-
         add(saveProfileButton);
 
         Button createGroupButton = new Button("Create Group", event -> {
@@ -108,7 +107,6 @@ public class Website extends VerticalLayout {
             session.setAttribute("groupCode", code);
             UI.getCurrent().navigate("lobby");
         });
-
         add(createGroupButton);
 
         Button joinGroupButton = new Button("Join Group", event -> {
@@ -133,7 +131,6 @@ public class Website extends VerticalLayout {
             dialog.add(new VerticalLayout(codeField, submitButton));
             dialog.open();
         });
-
         add(joinGroupButton);
     }
 }
