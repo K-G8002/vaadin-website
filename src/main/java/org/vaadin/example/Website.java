@@ -42,7 +42,25 @@ public class Website extends VerticalLayout {
         avatarImage.setHeight("150px");
         avatarImage.getStyle().set("border-radius", "50%");
 
-        Button previousButton = new Button("<", event -> {
+        Image rotateButton = new Image("https://www.iconsdb.com/icons/preview/black/refresh-xxl.png", "Rotate");
+        rotateButton.setWidth("40px");
+        rotateButton.setHeight("40px");
+        rotateButton.getStyle()
+                .set("cursor", "pointer")
+                .set("border-radius", "50%")
+                .set("background", "white")
+                .set("padding", "5px");
+
+        rotateButton.addClickListener(event -> {
+            currentAvatarIndex = (currentAvatarIndex + 1) % avatarUrls.size();
+            avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
+        });
+
+        HorizontalLayout avatarLayout = new HorizontalLayout(avatarImage, rotateButton);
+        avatarLayout.setAlignItems(Alignment.CENTER);
+        add(avatarLayout);
+
+        /*Button previousButton = new Button("<", event -> {
             currentAvatarIndex = (currentAvatarIndex - 1 + avatarUrls.size()) % avatarUrls.size();
             avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
         });
@@ -51,8 +69,7 @@ public class Website extends VerticalLayout {
             currentAvatarIndex = (currentAvatarIndex + 1) % avatarUrls.size();
             avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
         });
-
-        add(new HorizontalLayout(previousButton, avatarImage, nextButton));
+        add(new HorizontalLayout(previousButton, avatarImage, nextButton));*/
 
         TextField nicknameField = new TextField("Nickname");
         nicknameField.setPlaceholder("Name");
