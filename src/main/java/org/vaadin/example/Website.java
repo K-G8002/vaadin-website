@@ -4,7 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -37,14 +37,16 @@ public class Website extends VerticalLayout {
     public Website() {
         addClassName("centered-content");
 
+        new Lobby();
+
         Image avatarImage = new Image(avatarUrls.get(currentAvatarIndex), "Avatar");
         avatarImage.setWidth("150px");
         avatarImage.setHeight("150px");
         avatarImage.getStyle().set("border-radius", "50%");
 
-        Image rotateButton = new Image("https://www.iconsdb.com/icons/preview/black/refresh-xxl.png", "Rotate");
-        rotateButton.setWidth("40px");
-        rotateButton.setHeight("40px");
+        var rotateButton = VaadinIcon.ROTATE_LEFT.create();
+        rotateButton.getStyle().set("width", "40px");
+        rotateButton.getStyle().set("height", "40px");
         rotateButton.getStyle()
                 .set("cursor", "pointer")
                 .set("border-radius", "50%")
@@ -60,7 +62,7 @@ public class Website extends VerticalLayout {
         avatarLayout.setAlignItems(Alignment.CENTER);
         add(avatarLayout);
 
-        /*Button previousButton = new Button("<", event -> {
+        /* Button previousButton = new Button("<", event -> {
             currentAvatarIndex = (currentAvatarIndex - 1 + avatarUrls.size()) % avatarUrls.size();
             avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
         });
@@ -69,9 +71,12 @@ public class Website extends VerticalLayout {
             currentAvatarIndex = (currentAvatarIndex + 1) % avatarUrls.size();
             avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
         });
-        add(new HorizontalLayout(previousButton, avatarImage, nextButton));*/
+        add(new HorizontalLayout(previousButton, avatarImage, nextButton)); */
 
         TextField nicknameField = new TextField("Nickname");
+        nicknameField.addValueChangeListener(event -> {
+
+        });
         nicknameField.setPlaceholder("Name");
         add(nicknameField);
 
@@ -152,38 +157,7 @@ public class Website extends VerticalLayout {
     }
 }
 
-@Route("lobby")
-class Lobby extends VerticalLayout {
 
-    public Lobby() {
-        addClassName("centered-content");
-
-        VaadinSession session = VaadinSession.getCurrent();
-        if (session == null) {
-            Notification.show("Fehler: Keine aktive Sitzung.");
-            UI.getCurrent().navigate("website");
-            return;
-        }
-
-        String groupCode = (String) session.getAttribute("groupCode");
-        if (groupCode == null) {
-            Notification.show("Du bist keiner Gruppe zugeordnet.");
-            UI.getCurrent().navigate("website");
-            return;
-        }
-        add(new Span("Dein Gruppen-Code: " + groupCode));
-
-        Button showMembers = new Button("Show Group Members", event -> {
-            Notification.show("Gruppenmitglieder: " + GroupManager.getGroupMembers().toString());
-        });
-        add(showMembers);
-
-        Button leaveGroupButton = new Button("Leave group", event -> {
-            UI.getCurrent().navigate("website");
-        });
-        add(leaveGroupButton);
-    }
-}
 
 
 
