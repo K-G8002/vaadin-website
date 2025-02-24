@@ -62,17 +62,6 @@ public class Website extends VerticalLayout {
         avatarLayout.setAlignItems(Alignment.CENTER);
         add(avatarLayout);
 
-        /* Button previousButton = new Button("<", event -> {
-            currentAvatarIndex = (currentAvatarIndex - 1 + avatarUrls.size()) % avatarUrls.size();
-            avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
-        });
-
-        Button nextButton = new Button(">", event -> {
-            currentAvatarIndex = (currentAvatarIndex + 1) % avatarUrls.size();
-            avatarImage.setSrc(avatarUrls.get(currentAvatarIndex));
-        });
-        add(new HorizontalLayout(previousButton, avatarImage, nextButton)); */
-
         TextField nicknameField = new TextField("Nickname");
         nicknameField.addValueChangeListener(event -> {
 
