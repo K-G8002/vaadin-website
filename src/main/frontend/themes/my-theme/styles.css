@@ -17,5 +17,15 @@ vaadin-text-field.bordered::part(input-field) {
 }
 
 .main-background {
-    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 45%, rgba(0,212,255,1) 100%)
+
+    background: linear-gradient(135deg, #ff00ff, #ff8800, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+    background-size: 400% 400%;
+    animation: gradientAnimation 5s ease infinite;
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
 }
